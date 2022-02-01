@@ -28,7 +28,6 @@ const {
   tornadoServiceFee,
   tornadoGoerliProxy,
   tornadoProxyNew,
-  expectedProposalId,
   governanceAddress,
   aggregatorAddress,
 } = require('./config')
@@ -201,7 +200,6 @@ async function checkMiningFee({ args }) {
 }
 
 async function isLatestProposalExecuted() {
-  let status = 0
   const PROPOSAL_EXECUTED_STATUS = 5
   const expectedProposalId = 10
   try {
