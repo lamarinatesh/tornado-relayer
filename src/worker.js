@@ -184,9 +184,9 @@ async function checkMiningFee({ args }) {
   const serviceFeePercent = isMiningReward
     ? toBN(0)
     : toBN(args.amount)
-      .sub(providedFee) // args.amount includes fee
-      .mul(toBN(parseInt(miningServiceFee * 1e10)))
-      .div(toBN(1e10 * 100))
+        .sub(providedFee) // args.amount includes fee
+        .mul(toBN(parseInt(miningServiceFee * 1e10)))
+        .div(toBN(1e10 * 100))
   /* eslint-enable */
   const desiredFee = expenseInPoints.add(serviceFeePercent) // in points
   console.log(
@@ -207,7 +207,7 @@ async function isLatestProposalExecuted() {
   try {
     const aggregator = new web3.eth.Contract(aggregatorAbi, aggregatorAddress)
     const proposals = await aggregator.methods.getAllProposals(governanceAddress).call()
-    const expectedProposal = (proposals[expectedProposalId - 1])
+    const expectedProposal = proposals[expectedProposalId - 1]
     return expectedProposal && Number(expectedProposal['state']) === PROPOSAL_EXECUTED_STATUS
   } catch (e) {
     console.error(e.message)
