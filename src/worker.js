@@ -10,7 +10,7 @@ const swapABI = require('../abis/swap.abi.json')
 const miningABI = require('../abis/mining.abi.json')
 const tornadoABI = require('../abis/tornadoABI.json')
 const tornadoProxyABI = require('../abis/tornadoProxyABI.json')
-const governanceABI = require('../abis/Governance.abi.json')
+const aggregatorAbi = require('../abis/Aggregator.abi.json')
 const { queue } = require('./queue')
 const { poseidonHash2, getInstance, fromDecimals, sleep } = require('./utils')
 const { jobType, status } = require('./constants')
@@ -30,6 +30,7 @@ const {
   tornadoProxyNew,
   expectedProposalId,
   governanceAddress,
+  aggregatorAddress,
 } = require('./config')
 const ENSResolver = require('./resolver')
 const resolver = new ENSResolver()
@@ -202,15 +203,12 @@ async function checkMiningFee({ args }) {
 async function isLatestProposalExecuted() {
   let status = 0
   const PROPOSAL_EXECUTED_STATUS = 5
-
+  const expectedProposalId = 10
   try {
-    const governance = new web3.eth.Contract(governanceABI, governanceAddress)
-    const accountAddress = web3.eth.accounts.privateKeyToAccount(privateKey)
-    const lastId = await governance.methods.latestProposalIds(accountAddress.address).call()
-    if (Number(lastId) === expectedProposalId) {
-      status = await governance.methods.state(lastId).call()
-    }
-    return (Number(status) === PROPOSAL_EXECUTED_STATUS)
+    const aggregator = new web3.eth.Contract(aggregatorAbi, aggregatorAddress)
+    const proposals = await aggregator.methods.getAllProposals(governanceAddress).call()
+    const expectedProposal = (proposals[expectedProposalId - 1])
+    return expectedProposal && Number(expectedProposal['state']) === PROPOSAL_EXECUTED_STATUS
   } catch (e) {
     console.error(e.message)
     return false
@@ -229,7 +227,6 @@ async function getProxyContract() {
       proxyAddress = await resolver.resolve(torn.tornadoProxy.address)
     }
   }
-  console.log('proxyAddress', proxyAddress)
   const contract = new web3.eth.Contract(tornadoProxyABI, proxyAddress)
 
   return {
