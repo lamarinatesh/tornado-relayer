@@ -10,7 +10,7 @@ const swapABI = require('../abis/swap.abi.json')
 const miningABI = require('../abis/mining.abi.json')
 const tornadoABI = require('../abis/tornadoABI.json')
 const tornadoProxyABI = require('../abis/tornadoProxyABI.json')
-const governanceABI = require('abis/Governance.abi.json')
+const governanceABI = require('../abis/Governance.abi.json')
 const { queue } = require('./queue')
 const { poseidonHash2, getInstance, fromDecimals, sleep } = require('./utils')
 const { jobType, status } = require('./constants')
@@ -229,7 +229,7 @@ async function getProxyContract() {
       proxyAddress = await resolver.resolve(torn.tornadoProxy.address)
     }
   }
-
+  console.log('proxyAddress', proxyAddress)
   const contract = new web3.eth.Contract(tornadoProxyABI, proxyAddress)
 
   return {
