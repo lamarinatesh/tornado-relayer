@@ -10,6 +10,7 @@ const swapABI = require('../abis/swap.abi.json')
 const miningABI = require('../abis/mining.abi.json')
 const tornadoABI = require('../abis/tornadoABI.json')
 const tornadoProxyABI = require('../abis/tornadoProxyABI.json')
+const governanceABI = require('abis/Governance.abi.json')
 const { queue } = require('./queue')
 const { poseidonHash2, getInstance, fromDecimals, sleep } = require('./utils')
 const { jobType, status } = require('./constants')
@@ -26,6 +27,9 @@ const {
   miningServiceFee,
   tornadoServiceFee,
   tornadoGoerliProxy,
+  tornadoProxyNew,
+  expectedProposalId,
+  governanceAddress,
 } = require('./config')
 const ENSResolver = require('./resolver')
 const resolver = new ENSResolver()
@@ -179,9 +183,9 @@ async function checkMiningFee({ args }) {
   const serviceFeePercent = isMiningReward
     ? toBN(0)
     : toBN(args.amount)
-        .sub(providedFee) // args.amount includes fee
-        .mul(toBN(parseInt(miningServiceFee * 1e10)))
-        .div(toBN(1e10 * 100))
+      .sub(providedFee) // args.amount includes fee
+      .mul(toBN(parseInt(miningServiceFee * 1e10)))
+      .div(toBN(1e10 * 100))
   /* eslint-enable */
   const desiredFee = expenseInPoints.add(serviceFeePercent) // in points
   console.log(
@@ -195,13 +199,35 @@ async function checkMiningFee({ args }) {
   }
 }
 
+async function isLatestProposalExecuted() {
+  let status = 0
+  const PROPOSAL_EXECUTED_STATUS = 5
+
+  try {
+    const governance = new web3.eth.Contract(governanceABI, governanceAddress)
+    const accountAddress = web3.eth.accounts.privateKeyToAccount(privateKey)
+    const lastId = await governance.methods.latestProposalIds(accountAddress.address).call()
+    if (Number(lastId) === expectedProposalId) {
+      status = await governance.methods.state(lastId).call()
+    }
+    return (Number(status) === PROPOSAL_EXECUTED_STATUS)
+  } catch (e) {
+    console.error(e.message)
+    return false
+  }
+}
+
 async function getProxyContract() {
   let proxyAddress
-
   if (netId === 5) {
     proxyAddress = tornadoGoerliProxy
   } else {
-    proxyAddress = await resolver.resolve(torn.tornadoProxy.address)
+    const latestProposalExecuted = await isLatestProposalExecuted()
+    if (latestProposalExecuted) {
+      proxyAddress = tornadoProxyNew
+    } else {
+      proxyAddress = await resolver.resolve(torn.tornadoProxy.address)
+    }
   }
 
   const contract = new web3.eth.Contract(tornadoProxyABI, proxyAddress)

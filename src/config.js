@@ -18,7 +18,9 @@ module.exports = {
   tornadoServiceFee: Number(process.env.REGULAR_TORNADO_WITHDRAW_FEE),
   miningServiceFee: Number(process.env.MINING_SERVICE_FEE),
   rewardAccount: process.env.REWARD_ACCOUNT,
+  governanceAddress:  '0x5efda50f22d34F262c29268506C5Fa42cB56A1Ce',
   tornadoGoerliProxy: '0x454d870a72e29d5E5697f635128D18077BD04C60',
+  tornadoProxyNew: '_insert_new_address_here_',
   gasLimits: {
     [jobType.TORNADO_WITHDRAW]: 390000,
     WITHDRAW_WITH_EXTRA: 550000,
@@ -27,4 +29,5 @@ module.exports = {
   },
   minimumBalance: '1000000000000000000',
   baseFeeReserve: Number(process.env.BASE_FEE_RESERVE_PERCENTAGE),
+  expectedProposalId: 10
 }
