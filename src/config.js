@@ -20,7 +20,7 @@ module.exports = {
   rewardAccount: process.env.REWARD_ACCOUNT,
   governanceAddress: '0x5efda50f22d34F262c29268506C5Fa42cB56A1Ce',
   tornadoGoerliProxy: '0x454d870a72e29d5E5697f635128D18077BD04C60',
-  tornadoProxyNew: '_insert_new_address_here_',
+  tornadoRouter: '0x6cfBb55D309Cb49e96a486a25aF744B5B97b6c63',
   gasLimits: {
     [jobType.TORNADO_WITHDRAW]: 390000,
     WITHDRAW_WITH_EXTRA: 550000,

@@ -27,7 +27,7 @@ const {
   miningServiceFee,
   tornadoServiceFee,
   tornadoGoerliProxy,
-  tornadoProxyNew,
+  tornadoRouter,
   governanceAddress,
   aggregatorAddress,
 } = require('./config')
@@ -220,7 +220,7 @@ async function getProxyContract() {
   } else {
     const latestProposalExecuted = await isLatestProposalExecuted()
     if (latestProposalExecuted) {
-      proxyAddress = tornadoProxyNew
+      proxyAddress = tornadoRouter
     } else {
       proxyAddress = await resolver.resolve(torn.tornadoProxy.address)
     }
